@@ -5,6 +5,7 @@ import time
 import platform
 import sounddevice as sd
 import soundfile as sf
+import sys
 
 from prettytable import PrettyTable
 
@@ -16,10 +17,18 @@ def start():
 def stop():
     print("Game close...")
     play("stop.wav")
-    exit("Finish.")
+    sys.exit(0)
+
+def get_base_dir():
+    if getattr(sys, 'frozen', False):
+        return sys._MEIPASS  # dossier temporaire PyInstaller
+    return os.path.dirname(os.path.abspath(__file__))
+
+BASE_DIR = get_base_dir()
 
 def play(filename):
-    data, fs = sf.read(f"musique/{filename}")
+    path = os.path.join(BASE_DIR, "musique", filename)
+    data, fs = sf.read(path)
     sd.play(data, fs)
     sd.wait()
 
@@ -256,6 +265,7 @@ def code1():
         strt = input("Write here: ")
         if strt in ["start", "strt"]:
             start()
+            break
         elif strt in ["stop", "st"]:
             stop()
         else:
