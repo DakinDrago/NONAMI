@@ -178,7 +178,7 @@ def facts():
     if fact == 1:
         print("Le créateur de Nonami a aussi créé Transcriptor.")
     elif fact == 2:
-        print("Nonami est dans sa version: 0.5. Imaginez que ce texte doit changer chaque fois (il est unique).")
+        print("Nonami est dans sa version: 0.5.1. Imaginez que ce texte doit changer chaque fois (il est unique).")
     elif fact == 3:
         print("Savez-vous que Nonami a commencé seulement à partir de Math5, qui lui s'appelait autre fois juste Math ?")
     elif fact == 4:
