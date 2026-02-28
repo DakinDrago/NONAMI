@@ -1,33 +1,34 @@
 # Commands File
 import os
 import random
-import subprocess
 import time
 import platform
-import winsound
+import sounddevice as sd
+import soundfile as sf
 
-# from playsound import playsound
 from prettytable import PrettyTable
 
 # "Code of commands"
 def start():
     print("Game start...")
-    winsound.Beep(1567, 750)
+    play("start.wav")
 
 def stop():
-    winsound.Beep(784, 333)
     print("Game close...")
-    winsound.Beep(1174, 333)
-    winsound.Beep(1568, 333)
-    time.sleep(1)
+    play("stop.wav")
     exit("Finish.")
+
+def play(filename):
+    data, fs = sf.read(f"musique/{filename}")
+    sd.play(data, fs)
+    sd.wait()
 
 def command_list():
     table = PrettyTable()
     table.field_names = ["Command name", "Typing", "Utilities"]
     table.add_row(["Command List", "cl", "Montre les différentes commandes"])
     table.add_row(["Command", "cd", "Donne la possibilité de fare des commandes"])
-    table.add_row(["Play", "game", "Montre les jeux disponibles"])
+    table.add_row(["Jeux", "games", "Montre les jeux disponibles"])
     table.add_row(["Arrêt", "stop", "Met fin au code"])
     table.add_row(["Calculator", "cal", "Permet des calculs avec une calculatrice"])
     table.add_row(["Direct cal.", "dcal", "Part directement dans la calculatrice"])
@@ -35,68 +36,56 @@ def command_list():
     table.add_row(["Faits", "fact", "Donne des faits interresants de Nonami"])
     table.add_row(["Get-time", "gtime", "Donne le temps"])
     table.add_row(["Code Morse", "morse", "Traduit en Morse les entrées"])
+    table.add_row(["Devapps", "apps", "Montre les applications en développement"])
     print(table)
     time.sleep(0.5)
-    commands()
 
 def commands():
-    command = input(">")
-    if command in ["jeux", "game"]:
-        jeux()
-    elif command in ["command_list", "cl"]:
-        command_list()
-    elif command in ["stop", "st"]:
-        stop()
-    elif command in ["reload"]:
-        reload()
-    elif command == "math5":
-        math5()
-    elif command in ["commands", "cd",]:
-        print()
-        commands()
-    elif command in ["astuce", "atc"]:
-        astuces()
-    elif command == "fact":
-        facts()
-    elif command == "morse":
-        morse()
-    elif command in ["gtime", "time"]:
-        get_time()
-    elif command in ["calculator", "cal"]:
-        calculator()
-    elif command == "dcal":
-        math_lines()
-    elif command == "clear":
-        clear()
-    else:
-        winsound.Beep(1318, 100)
-        print("Cette commande est inexistante.")
-        winsound.Beep(1318, 100)
-        print()
-        commands()
-
-def math5():
-    print("Math5 game...")
-    import math5 as logic
-    logic.launcher()
-    commands()
+    while True:
+        command = input(">")
+        if command in ["jeux", "games"]:
+            jeux()
+        elif command in ["command_list", "cl"]:
+            command_list()
+        elif command in ["stop", "st"]:
+            stop()
+        elif command in ["reload"]:
+            reload()
+        elif command in ["devapps", "dev", "apps"]:
+            devapps()
+        elif command in ["commands", "cd",]:
+            print()
+        elif command in ["astuce", "atc"]:
+            astuces()
+        elif command == "fact":
+            facts()
+        elif command == "morse":
+            morse()
+        elif command in ["gtime", "time"]:
+            get_time()
+        elif command in ["calculator", "cal"]:
+            calculator()
+        elif command == "dcal":
+            math_lines()
+        elif command == "clear":
+            clear()
+        else:
+            play("error.wav")
+            print("Cette commande est inexistante.")
+            play("error.wav")
+            print()
 
 def jeux():
-    print("""Si vous voulez retourner au menu principal, faites cd.
-    Voici la liste des jeux disponibles:
-    Math5 (ex. math5).""")
-    jeux_rep = input("Rep: ")
-    if jeux_rep == "math5":
-        math5()
-    elif jeux_rep == "cd":
-        commands()
-    else:
-        illegal()
+    import games as logic
+    logic.launch()
+
+def devapps():
+    import devapps as logic
+    logic.menu()
 
 def get_time():
     ac_clock = time.ctime()
     print(f"{ac_clock} est votre heure actuelle.")
-    commands()
 
 def calculator():
     time.sleep(1)
@@ -106,17 +95,13 @@ def calculator():
 def math_lines():
     while True:
         a = input("~")
-        if a.lower() == "bye":
-            bye()
-            break
-        elif a.lower() == "stop":
+        if a.lower() == "stop":
             stop()
             break
         elif a.lower() == "pop":
             poss_op()
             break
         elif a.lower() == "cd":
-            commands()
             break
         else:
             try:
@@ -125,7 +110,6 @@ def math_lines():
                 time.sleep(1)
             except Exception as e:
                 print("Calculator Error : ", e)
-        math_lines()
 
 def poss_op():
     print("""Voici quelques posibilités d'opération:
@@ -136,7 +120,7 @@ def poss_op():
     ** | Élève un nombre à une puissance.""")
     time.sleep(0.5)
     print("Besoin d'aide, faites pop.")
-    print("Faites cd pour revenir aux commandes normales, bye pour voir d'autres jeux et stop pour tout arrêter.")
+    print("Faites cd pour revenir aux commandes normales ou stop pour tout arrêter.")
     math_lines()
 
 def astuces():
@@ -145,7 +129,7 @@ def astuces():
     time.sleep(0.5)
     print("Voici un conseil ou une astuce !")
 
-    astuce = random.randint(1, 9)
+    astuce = random.randint(1, 10)
     if astuce == 1:
         print("""Faites attention avec la commande (cl) et (clear). Ce n'est pas la même chose !
         cl revient aux commandes alors que clear efface TOUT.""")
@@ -156,6 +140,8 @@ def astuces():
         table.add_row([">", "Vous êtes aux commandes."])
         table.add_row(["~", "Vous êtes dans calculator."])
         table.add_row(["£", "Vous êtes dans le jeux Morse."])
+        table.add_row(["->", "Vous êtes dans le Launcher de jeux."])
+        table.add_row([">>>", "Vous êtes dans le menu des applications en développement."])
         print(table)
     elif astuce == 4:
         print("Entraînez-vous sur Math5 pour devenir fort en addition.")
@@ -169,20 +155,21 @@ def astuces():
         print("Nonami n'aime pas trop lorsqu'on le 'down'. Faites pluto la commande stop lorsqu'elle est disponible.")
     elif astuce == 9:
         print("Dans Morse, utilisez tous les caractères graphiques (é,ï,ç), ils fonctionneront !")
+    elif astuce == 10:
+        print("Vous voulez faire crash Nonami ? Allez testez les applications en développement !")
     else:
         illegal()
-    commands()
 
 def facts():
     print()
     time.sleep(0.5)
     print("Voici un fait sur Nonami !")
 
-    fact = random.randint(1, 22)
+    fact = random.randint(1, 27)
     if fact == 1:
         print("Le créateur de Nonami a aussi créé Transcriptor.")
     elif fact == 2:
-        print("Nonami est dans sa version: 0.4.9 . Imaginez que ce texte doit changer chaque fois (il est unique).")
+        print("Nonami est dans sa version: 0.5. Imaginez que ce texte doit changer chaque fois (il est unique).")
     elif fact == 3:
         print("Savez-vous que Nonami a commencé seulement à partir de Math5, qui lui s'appelait autre fois juste Math ?")
     elif fact == 4:
@@ -201,7 +188,7 @@ def facts():
     elif fact == 10:
         print("Calculator est directement lié à Python. Il a été ajouté à la version mineure: 0.3.2 .")
     elif fact == 11:
-        print("Les versions plus que mineures (c'est une appellation) comme ceci x.x.x.0 (représentées par le 0) est, pour le moment, juste des corrections de bugs.")
+        print("Les versions plus que mineures (c'est une appellation) comme ceci x.x.0 (représentées par le 0) est, pour le moment, juste des corrections de bugs.")
     elif fact == 12:
         print("J'espère que la commande facts fonctionnera... Ouups !?! ... ça ne doit pas être ici !")
     elif fact == 13:
@@ -226,17 +213,26 @@ def facts():
         time.sleep(0.25)
         print("𝕷𝖊 𝕯𝖔𝖈𝖚𝖒𝖊𝖓𝖙𝖆𝖎𝖗𝖊 est une (future) entreprise d'information mondiale. Voilà.")
     elif fact == 20:
-        print("Il y a 22 faits en tout (+ celui-ci) !")
+        print("Il y a 25 faits en tout (+ celui-ci) !")
     elif fact == 21:
         print("Le son d'introduction de Nonami a été imaginé du jour au lendemain !")
     elif fact == 22:
         print("La traduction en Morse a été ajouté au cours du développement de la version 0.4.8 !")
+    elif fact == 23:
+        print("Nonami a été fait pour être un projet de programmation amusant, mais aussi pour apprendre et s'améliorer en Python !")
+    elif fact == 24:
+        print("Le Laucher de jeux et les applications en développement ont été ajoutés à la version majeure 0.5. Allez les tester !")
+    elif fact == 25:
+        print("Il existe des commandes secrètes... ne crackez pas le code pour les trouver, svp...")
+    elif fact == 26:
+        print("Une toute nouvelle bibliothèque de sons a été ajoutée à Nonami pour la version 0.5 !")
+    elif fact == 27:
+        print("De noumbreuses optimisations ont été faites pour la version 0.5, notamment pour les commandes et les jeux !")
     else:
         illegal()
-    commands()
 
 def clear():
-    """Efface l'écran de la console de façon portable."""
+    # Efface l'écran de la console de façon portable.
     system = platform.system()
 
     if system == 'Windows':
@@ -249,52 +245,24 @@ def clear():
 
     time.sleep(1)
     print("La console a été clear.")
-    commands()
-
-def bye():
-    print("Vous voulez sortir du jeu ?")
-    time.sleep(0.5)
-    print("""Il y a d'autres jeux ! Faites jeux.""")
-    time.sleep(1)
-    print("Vous voulez quitter ? Faites stop ou st.")
-    print("Voulez-vous revenir au menu principal ? Faites: cd.")
-
-    def bye_rep():
-        return input("Rep: ")
-
-    response = bye_rep()
-    if response == "jeux":
-        jeux()
-    elif response in ["stop", "st"]:
-        stop()
-    elif response == "cd":
-        commands()
-    else:
-        print("Ceci n'est pas dans les choix.")
-        time.sleep(1)
-        print()
-        bye_rep()
 
 def illegal():
-    winsound.Beep(784, 333)
     print("Hooo, ça n'a pas fonctionné. »»» Sortie de code.")
-    winsound.Beep(784, 333)
-    winsound.Beep(784, 333)
+    play("illegal.wav")
     print()
-    commands()
 
 def code1():
-    strt = input("Write here: ")
-    if strt in ["start", "strt"]:
-        start()
-    elif strt in ["stop", "st"]:
-        stop()
-    else:
-        winsound.Beep(1318, 100)
-        print("Ceci n'est pas dans les choix. Faites *stop* ou *st* (sans les stars) pour quitter.")
-        winsound.Beep(1318, 100)
-        time.sleep(1)
-        code1()
+    while True:
+        strt = input("Write here: ")
+        if strt in ["start", "strt"]:
+            start()
+        elif strt in ["stop", "st"]:
+            stop()
+        else:
+            play("error.wav")
+            print("Ceci n'est pas dans les choix. Faites *stop* ou *st* (sans les stars) pour quitter.")
+            play("error.wav")
+            time.sleep(1)
 
 def cal_rules():
     rule = input("Voulez-vous voir les instructions de calculator ? (y/n)> ")
@@ -305,7 +273,7 @@ def cal_rules():
         Vous devez uniquement utiliser des fonction des maths pour faire vos opérations.
         Vos opérations doivent être seulement dans une ligne.
         Besoin d'aide, faites pop.
-        Si vous voulez quitter, faites bye ou cd pour menu principal.
+        Si vous voulez quitter, faites cd pour menu principal.
         """)
         time.sleep(2)
         print("""Voici quelques posibilités d'opération:
@@ -324,15 +292,7 @@ def reload():
     os.execv(sys.executable, ["python"] + sys.argv)
 
 def intro():
-    import winsound
-    winsound.Beep(587, 200)
-    winsound.Beep(587, 200)
-    winsound.Beep(587, 200)
-    winsound.Beep(493, 200)
-    winsound.Beep(523, 200)
-    winsound.Beep(493, 200)
-    winsound.Beep(440, 200)
-    winsound.Beep(392, 200)
+    play("intro.wav")
 
 def morse():
     morse_code = {
@@ -354,14 +314,10 @@ def morse():
 
     while True:
         text = input("£ ")
-        if text.lower() == "bye":
-            bye()
-            break
-        elif text.lower() == "stop":
+        if text.lower() == "stop":
             stop()
             break
         elif text.lower() == "cd":
-            commands()
             break
         else:
             try:
@@ -369,9 +325,9 @@ def morse():
                 print(encoded_text)
                 for char in encoded_text:
                     if char == '.':
-                        winsound.Beep(1174, 250)
+                        play("dot.wav")
                     elif char == '-':
-                        winsound.Beep(1174, 600)
+                        play("dash.wav")
                     elif char == ' ':
                         time.sleep(0.25)
                     # Ajoutez d'autres sons Morse au besoin

@@ -1,4 +1,3 @@
-import inputs
 import random
 
 def launcher():
@@ -8,15 +7,9 @@ def launcher():
         math5_rule = input("Voulez-vous voir le règlement ? (y/n): ")
         if math5_rule == "y":
             print("""Vous devez saisir une liste de 5 nombres dont la somme est égal de ce nombre.
-            Vous n'avez pas le droit de mettre la même somme que celle donnée ou de mettre un 0.
-            Avez-vous compris ? (y/n)""")
-            rep = input('Rep: ')
-            if rep == 'y':
-                print('Bien...')
-                code()
-                break
-            else:
-                inputs.bye()
+    Vous n'avez pas le droit de mettre la même somme que celle donnée ou de mettre un 0.""")
+            code()
+            break
         elif math5_rule == "n":
             code()
             break
@@ -52,5 +45,3 @@ def code():
         print("Bravo, vous avez réussi !")
     else:
         print(f"Raté. {total} n'est pas égal à {NOM}.")
-
-launcher()
